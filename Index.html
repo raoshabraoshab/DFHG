@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>School Chat</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.app {
+  width: 360px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  padding: 15px;
+}
+input, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+}
+.chat {
+  height: 260px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  margin-top: 10px;
+  padding: 5px;
+}
+.msg {
+  margin: 5px 0;
+}
+.me { color: blue; }
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <h3>School Chat</h3>
+
+  <input id="myName" placeholder="Your Name">
+  <input id="chatWith" placeholder="Chat With (Name)">
+  <input id="message" placeholder="Type message">
+  <button onclick="send()">Send</button>
+
+  <div class="chat" id="chatBox"></div>
+</div>
+
+<script>
+const chatBox = document.getElementById("chatBox");
+
+function send() {
+  const from = myName.value;
+  const to = chatWith.value;
+  const text = message.value;
+
+  if (!from || !to || !text) return;
+
+  const chats = JSON.parse(localStorage.getItem("chats")) || [];
+  chats.push({ from, to, text });
+
+  localStorage.setItem("chats", JSON.stringify(chats));
+  message.value = "";
+  load();
+}
+
+function load() {
+  chatBox.innerHTML = "";
+  const from = myName.value;
+  const to = chatWith.value;
+
+  const chats = JSON.parse(localStorage.getItem("chats")) || [];
+  chats
+    .filter(c =>
+      (c.from === from && c.to === to) ||
+      (c.from === to && c.to === from)
+    )
+    .forEach(c => {
+      const div = document.createElement("div");
+      div.className = "msg " + (c.from === from ? "me" : "");
+      div.textContent = c.from + ": " + c.text;
+      chatBox.appendChild(div);
+    });
+}
+
+setInterval(load, 1000);
+</script>
+
+</body>
+</html>
